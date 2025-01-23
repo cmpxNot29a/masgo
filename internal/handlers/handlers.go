@@ -35,6 +35,11 @@ func ValidateURL(r *http.Request) error {
 		return errors.New(errorInvalidRequestFormat)
 	}
 
+	// Проверяем наличие значения метрики (четвертая часть URL).
+	if parts[4] == "" {
+		return errors.New(errorMetricNameRequired)
+	}
+
 	return nil
 }
 
