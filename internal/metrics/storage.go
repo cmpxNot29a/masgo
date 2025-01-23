@@ -1,6 +1,9 @@
 package metrics
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // Константы для сообщений об ошибках.
 const (
@@ -40,18 +43,19 @@ func (s *MemStorage) Update(metric Metric) error {
 		currentValue, ok := s.metrics[TypeCounter][metric.Name]
 		if !ok {
 			// Если метрики с таким именем еще нет, считаем, что текущее значение равно 0.
-			currentValue = 0
+			currentValue = int64(0)
 		}
 		currentValueInt, ok := currentValue.(int64)
 		if !ok {
-			return fmt.Errorf(errorInvalidCounterValueType)
+			// fmt.Printf("metrics[%s][%s] = %v + %v", TypeCounter, metric.Name, currentValueInt, newValueInt)
+			return errors.New(errorInvalidCounterValueType)
 		}
-
 		newValueInt, ok := metric.Value.(int64)
 		if !ok {
-			return fmt.Errorf(errorInvalidCounterValueType)
+			fmt.Printf("metrics[%s][%s] = %v + %v", TypeCounter, metric.Name, currentValueInt, newValueInt)
+			return errors.New(errorInvalidCounterValueType)
 		}
-
+		fmt.Printf("metrics[%s][%s] = %v + %v", TypeCounter, metric.Name, currentValueInt, newValueInt)
 		s.metrics[TypeCounter][metric.Name] = currentValueInt + newValueInt // Добавляем новое значение к текущему.
 	default:
 		return fmt.Errorf(errorUnknownMetricType, metric.Type)

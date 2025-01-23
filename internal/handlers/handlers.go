@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -25,14 +25,14 @@ const (
 func ValidateURL(r *http.Request) error {
 	// Проверяем, что используется метод POST.
 	if r.Method != http.MethodPost {
-		return fmt.Errorf(errorOnlyPostAllowed)
+		return errors.New(errorOnlyPostAllowed)
 	}
 
 	// Разбиваем URL на части по разделителю "/".
 	parts := strings.Split(r.URL.Path, pathSeparator)
 	// Ожидаем, что URL будет иметь формат /update/{type}/{name}/{value}, то есть 5 частей, включая пустую в начале из-за /
 	if len(parts) != 5 {
-		return fmt.Errorf(errorInvalidRequestFormat)
+		return errors.New(errorInvalidRequestFormat)
 	}
 
 	return nil
@@ -42,7 +42,7 @@ func ValidateURL(r *http.Request) error {
 func ValidateMetric(metricTypeStr, metricName, metricValueStr string) (metrics.MetricType, interface{}, error) {
 	// Проверяем, что имя метрики не пустое.
 	if metricName == "" {
-		return "", nil, fmt.Errorf(errorMetricNameRequired)
+		return "", nil, errors.New(errorMetricNameRequired)
 	}
 
 	// Преобразуем строку в тип метрики.
@@ -57,16 +57,16 @@ func ValidateMetric(metricTypeStr, metricName, metricValueStr string) (metrics.M
 		// Парсим значение как float64.
 		metricValue, err = strconv.ParseFloat(metricValueStr, 64)
 		if err != nil {
-			return "", nil, fmt.Errorf(errorInvalidGaugeValue)
+			return "", nil, errors.New(errorInvalidGaugeValue)
 		}
 	case metrics.TypeCounter:
 		// Парсим значение как int64.
 		metricValue, err = strconv.ParseInt(metricValueStr, 10, 64)
 		if err != nil {
-			return "", nil, fmt.Errorf(errorInvalidCounterValue)
+			return "", nil, errors.New(errorInvalidCounterValue)
 		}
 	default:
-		return "", nil, fmt.Errorf(errorInvalidMetricType)
+		return "", nil, errors.New(errorInvalidMetricType)
 	}
 
 	return metricType, metricValue, nil
@@ -104,28 +104,31 @@ func ValidateAndUpdateRequest(r *http.Request, storage metrics.MemStorageInterfa
 	return nil
 }
 
-// UpdateHandler обрабатывает HTTP-запросы на обновление метрик.
 func UpdateHandler(storage metrics.MemStorageInterface) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Валидируем запрос и обновляем хранилище.
 		err := ValidateAndUpdateRequest(r, storage)
 		if err != nil {
 			// Обрабатываем ошибки валидации.
 			switch err.Error() {
 			case errorOnlyPostAllowed:
+				// Метод отличается от POST.
 				http.Error(w, err.Error(), http.StatusMethodNotAllowed)
 			case errorInvalidRequestFormat:
+				// Неправильный формат запроса.
 				http.Error(w, err.Error(), http.StatusBadRequest)
 			case errorMetricNameRequired:
+				// Не указано имя метрики.
 				http.Error(w, err.Error(), http.StatusNotFound)
 			case errorInvalidGaugeValue, errorInvalidCounterValue, errorInvalidMetricType:
+				// Ошибка в типе метрики или значении.
 				http.Error(w, err.Error(), http.StatusBadRequest)
 			default:
+				// Непредвиденная ошибка.
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 			return
 		}
-		// Отправляем ответ с кодом 200 OK.
+		// Отправляем ответ с кодом 200 OK в случае успеха.
 		w.WriteHeader(http.StatusOK)
 	}
 }
