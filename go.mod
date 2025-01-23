@@ -1,3 +1,3 @@
 module github.com/cmpxNot29a/masgo
 
-go 1.23.5
+go 1.22.11
