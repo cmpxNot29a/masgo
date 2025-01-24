@@ -47,15 +47,12 @@ func (s *MemStorage) Update(metric Metric) error {
 		}
 		currentValueInt, ok := currentValue.(int64)
 		if !ok {
-			// fmt.Printf("metrics[%s][%s] = %v + %v", TypeCounter, metric.Name, currentValueInt, newValueInt)
 			return errors.New(errorInvalidCounterValueType)
 		}
 		newValueInt, ok := metric.Value.(int64)
 		if !ok {
-			fmt.Printf("metrics[%s][%s] = %v + %v", TypeCounter, metric.Name, currentValueInt, newValueInt)
 			return errors.New(errorInvalidCounterValueType)
 		}
-		fmt.Printf("metrics[%s][%s] = %v + %v", TypeCounter, metric.Name, currentValueInt, newValueInt)
 		s.metrics[TypeCounter][metric.Name] = currentValueInt + newValueInt // Добавляем новое значение к текущему.
 	default:
 		return fmt.Errorf(errorUnknownMetricType, metric.Type)

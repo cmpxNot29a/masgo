@@ -34,9 +34,6 @@ func ValidateURL(r *http.Request) error {
 	path := strings.Trim(r.URL.Path, pathSeparator)
 	parts := strings.Split(path, pathSeparator)
 
-	println(path)
-	println(parts)
-
 	// Проверяем, что URL имеет формат /update/{type}/{name}/{value},
 	// то есть 4 части после удаления начальных и конечных слешей.
 	if len(parts) != 4 {
