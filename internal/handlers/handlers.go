@@ -11,14 +11,16 @@ import (
 
 // Константы для путей и сообщений об ошибках.
 const (
-	pathSeparator = "/" // Разделитель пути в URL.
+	pathSeparator     = "/"      // Разделитель пути в URL.
+	pathUpdateSegment = "update" // Сегмент пути "update"
 
-	errorOnlyPostAllowed      = "only POST requests are allowed" // Ошибка: разрешены только POST-запросы.
-	errorInvalidRequestFormat = "invalid request format"         // Ошибка: неверный формат запроса.
-	errorMetricNameRequired   = "metric name is required"        // Ошибка: требуется имя метрики.
-	errorInvalidGaugeValue    = "invalid gauge value"            // Ошибка: неверное значение gauge.
-	errorInvalidCounterValue  = "invalid counter value"          // Ошибка: неверное значение counter.
-	errorInvalidMetricType    = "invalid metric type"            // Ошибка: неверный тип метрики.
+	errorOnlyPostAllowed = "only POST requests are allowed" // Ошибка: разрешены только POST-запросы.
+	// errorInvalidRequestFormat = "invalid request format"         // Ошибка: неверный формат запроса.
+	errorNotFaundPage        = "page not found"          // Ошибка: страница не найдена.
+	errorMetricNameRequired  = "metric name is required" // Ошибка: требуется имя метрики.
+	errorInvalidGaugeValue   = "invalid gauge value"     // Ошибка: неверное значение gauge.
+	errorInvalidCounterValue = "invalid counter value"   // Ошибка: неверное значение counter.
+	errorInvalidMetricType   = "invalid metric type"     // Ошибка: неверный тип метрики.
 )
 
 // validateURL проверяет корректность URL запроса.
@@ -28,15 +30,26 @@ func ValidateURL(r *http.Request) error {
 		return errors.New(errorOnlyPostAllowed)
 	}
 
-	// Разбиваем URL на части по разделителю "/".
-	parts := strings.Split(r.URL.Path, pathSeparator)
-	// Ожидаем, что URL будет иметь формат /update/{type}/{name}/{value}, то есть 5 частей, включая пустую в начале из-за /
-	if len(parts) != 5 {
-		return errors.New(errorInvalidRequestFormat)
+	// Удаляем начальные и конечные слеши и разбиваем URL на части.
+	path := strings.Trim(r.URL.Path, pathSeparator)
+	parts := strings.Split(path, pathSeparator)
+
+	println(path)
+	println(parts)
+
+	// Проверяем, что URL имеет формат /update/{type}/{name}/{value},
+	// то есть 4 части после удаления начальных и конечных слешей.
+	if len(parts) != 4 {
+		return errors.New(errorNotFaundPage)
 	}
 
-	// Проверяем наличие значения метрики (четвертая часть URL).
-	if parts[4] == "" {
+	// Проверяем, что первая часть URL - "update".
+	if parts[0] != pathUpdateSegment {
+		return errors.New(errorNotFaundPage)
+	}
+
+	// Проверяем наличие имени метрики (третья часть URL).
+	if parts[2] == "" {
 		return errors.New(errorMetricNameRequired)
 	}
 
@@ -118,9 +131,9 @@ func UpdateHandler(storage metrics.MemStorageInterface) http.HandlerFunc {
 			case errorOnlyPostAllowed:
 				// Метод отличается от POST.
 				http.Error(w, err.Error(), http.StatusMethodNotAllowed)
-			case errorInvalidRequestFormat:
+			case errorNotFaundPage:
 				// Неправильный формат запроса.
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				http.Error(w, err.Error(), http.StatusNotFound)
 			case errorMetricNameRequired:
 				// Не указано имя метрики.
 				http.Error(w, err.Error(), http.StatusNotFound)
