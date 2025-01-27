@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/cmpxNot29a/masgo/internal/handlers"
-	"github.com/cmpxNot29a/masgo/internal/metrics"
+	"github.com/cmpxNot29a/masgo/internal/storage"
 )
 
 // Константы для путей и сообщений об ошибках.
@@ -19,7 +19,7 @@ const (
 
 func main() {
 	// Создаем хранилище метрик.
-	storage := metrics.NewMemStorage()
+	storage := storage.NewMemStorage()
 
 	// Создаем новый HTTP-мультиплексор.
 	mux := http.NewServeMux()

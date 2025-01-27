@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/cmpxNot29a/masgo/internal/metrics"
+	"github.com/cmpxNot29a/masgo/internal/storage"
 )
 
 // Константы для путей и сообщений об ошибках.
@@ -88,7 +89,7 @@ func ValidateMetric(metricTypeStr, metricName, metricValueStr string) (metrics.M
 }
 
 // validateAndUpdateRequest валидирует запрос и, в случае успеха, обновляет хранилище метрик.
-func ValidateAndUpdateRequest(r *http.Request, storage metrics.MemStorageInterface) error {
+func ValidateAndUpdateRequest(r *http.Request, storage storage.Repository) error {
 	// Проверяем корректность URL.
 	err := ValidateURL(r)
 	if err != nil {
@@ -119,7 +120,7 @@ func ValidateAndUpdateRequest(r *http.Request, storage metrics.MemStorageInterfa
 	return nil
 }
 
-func UpdateHandler(storage metrics.MemStorageInterface) http.HandlerFunc {
+func UpdateHandler(storage storage.Repository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := ValidateAndUpdateRequest(r, storage)
 		if err != nil {
