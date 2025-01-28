@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
-	"net/http/httputil"
 	"reflect"
 	"runtime"
 	"time"
@@ -109,10 +108,7 @@ func sendMetrics(metrics map[string]float64) {
 			fmt.Printf(errorSendingMetric, metricName, err)
 			continue
 		}
-		b, _ := httputil.DumpResponse(resp, true)
-		println(url)
-		println(string(b))
-
+		resp.Body.Close()
 	}
 
 	// Отправляем счетчик PollCount.
@@ -139,3 +135,4 @@ func main() {
 		time.Sleep(pollInterval)
 	}
 }
+
