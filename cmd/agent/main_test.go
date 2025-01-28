@@ -7,8 +7,8 @@ import (
 func Test_collectMetrics(t *testing.T) {
 	tests := []struct {
 		name       string
-		wantKeys   []string         // Ожидаемые ключи в метриках
-		checkValue bool             // Нужно ли проверять конкретные значения (например, > 0)
+		wantKeys   []string // Ожидаемые ключи в метриках
+		checkValue bool     // Нужно ли проверять конкретные значения (например, > 0)
 	}{
 		{
 			name: "Basic runtime metrics collected",
@@ -22,16 +22,6 @@ func Test_collectMetrics(t *testing.T) {
 			},
 			checkValue: true,
 		},
-		// {
-		// 	name:       "PollCount is incremented",
-		// 	wantKeys:   []string{"PollCount"},
-		// 	checkValue: false, // Значение будет проверяться в другом месте
-		// },
-		// {
-		// 	name:       "RandomValue metric exists",
-		// 	wantKeys:   []string{"RandomValue"},
-		// 	checkValue: false, // Проверка на присутствие метрики
-		// },
 	}
 
 	for _, tt := range tests {
@@ -56,4 +46,3 @@ func Test_collectMetrics(t *testing.T) {
 		})
 	}
 }
-

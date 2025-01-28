@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"net/http/httputil"
 	"reflect"
 	"runtime"
 	"time"
-	"net/http/httputil"
 )
 
 // Константы для настройки агента.
@@ -139,4 +139,3 @@ func main() {
 		time.Sleep(pollInterval)
 	}
 }
-

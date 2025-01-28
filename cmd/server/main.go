@@ -11,7 +11,7 @@ import (
 // Константы для путей и сообщений об ошибках.
 const (
 	serverAddress = "[::]:8080" // Адрес и порт сервера.
-	pathUpdate    = "/update/"       // Путь для обновления метрик.
+	pathUpdate    = "/update/"  // Путь для обновления метрик.
 
 	msgStartingServer   = "Starting server on "     // Сообщение о запуске сервера.
 	errorStartingServer = "Error starting server: " // Сообщение об ошибке при запуске сервера.
