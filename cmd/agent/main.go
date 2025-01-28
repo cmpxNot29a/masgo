@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"runtime"
 	"time"
+	"net/http/httputil"
 )
 
 // Константы для настройки агента.
@@ -108,7 +109,10 @@ func sendMetrics(metrics map[string]float64) {
 			fmt.Printf(errorSendingMetric, metricName, err)
 			continue
 		}
-		resp.Body.Close()
+		b, _ := httputil.DumpResponse(resp, true)
+		println(url)
+		println(string(b))
+
 	}
 
 	// Отправляем счетчик PollCount.

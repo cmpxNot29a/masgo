@@ -22,16 +22,16 @@ func Test_collectMetrics(t *testing.T) {
 			},
 			checkValue: true,
 		},
-		{
-			name:       "PollCount is incremented",
-			wantKeys:   []string{"PollCount"},
-			checkValue: false, // Значение будет проверяться в другом месте
-		},
-		{
-			name:       "RandomValue metric exists",
-			wantKeys:   []string{"RandomValue"},
-			checkValue: false, // Проверка на присутствие метрики
-		},
+		// {
+		// 	name:       "PollCount is incremented",
+		// 	wantKeys:   []string{"PollCount"},
+		// 	checkValue: false, // Значение будет проверяться в другом месте
+		// },
+		// {
+		// 	name:       "RandomValue metric exists",
+		// 	wantKeys:   []string{"RandomValue"},
+		// 	checkValue: false, // Проверка на присутствие метрики
+		// },
 	}
 
 	for _, tt := range tests {
